@@ -1,0 +1,123 @@
+#%% md
+
+## Classification – Simple Decision Rules
+
+#%% md
+
+#### Import libaries
+
+#%%
+
+import pandas as pd
+
+#%% md
+
+#### Load dataset
+
+#%%
+
+data = pd.read_csv('/users/jorge/desktop/drug.csv')
+data.head()
+
+#%% md
+
+##### Using our columns needed
+
+#%%
+
+x = data[['age', 'sex', 'bp', 'cholesterol', 'Na_to_K']].values
+
+#%% md
+
+#### Current dataset
+
+#%%
+
+x[0:5]
+
+#%% md
+
+#### ML Preprocessing
+
+#%%
+
+# Since we can't use labels
+# in ML we need to convert them into numerical values by preprocessing
+from sklearn import preprocessing
+
+#sex label
+sex = preprocessing.LabelEncoder()
+sex.fit(['F','M'])
+x[:,1] = sex.transform(x[:,1])
+
+#blood pressure label
+bp = preprocessing.LabelEncoder()
+bp.fit([ 'LOW', 'NORMAL', 'HIGH'])
+x[:,2] = bp.transform(x[:,2])
+
+#cholesterol label
+chol = preprocessing.LabelEncoder()
+chol.fit([ 'NORMAL', 'HIGH'])
+x[:,3] = chol.transform(x[:,3])
+
+#%% md
+
+#### After preprocessing
+
+#%%
+
+#we now have our x-value
+x[0:5]
+
+#%%
+
+#making our y-value
+y = data["drug"]
+y[0:5]
+
+#%% md
+
+### Train_test_split / Decision tree
+
+#%%
+
+#Train_test_split our model
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3)
+
+#%%
+
+#DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier
+clf = DecisionTreeClassifier(criterion="entropy", max_depth = 4)
+clf = clf.fit(x_train, y_train)
+
+#%%
+
+#checking our parameters
+clf.get_params()
+
+#%%
+
+predict = clf.predict(x_test)
+predict
+
+#%%
+
+clf.predict_proba(x_test)
+
+#%%
+
+#Visually comparing the predictions to the actual values
+print (predict[0:5])
+print (y_test [0:5])
+
+#%% md
+
+#### Prediction accuracy
+
+#%%
+
+from sklearn.metrics import accuracy_score
+print('Accuracy: ',accuracy_score(y_test, predict))
+
